@@ -1,0 +1,325 @@
+/* Reset & Base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  direction: rtl;
+  background: #f0f2f5;
+  min-height: 100vh;
+}
+
+/* Container اصلی */
+.app-container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 20px 16px 100px;
+  min-height: 100vh;
+}
+
+/* هدر */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0 8px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6C63FF, #3F3D9E);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.user-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.user-badge {
+  font-size: 11px;
+  color: #6C63FF;
+  background: #EEEEFF;
+  padding: 2px 10px;
+  border-radius: 20px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.icon-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* بخش خوش‌آمدگویی */
+.welcome-section {
+  background: linear-gradient(135deg, #6C63FF, #5A52D5);
+  border-radius: 20px;
+  padding: 24px 20px;
+  margin: 16px 0 24px;
+  color: white;
+}
+
+.welcome-section h1 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.welcome-section p {
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+/* کارت اضافه کردن تسک */
+.add-task-card {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.add-task-card input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  padding: 8px 4px;
+  background: transparent;
+  color: #1a1a2e;
+}
+
+.add-task-card input::placeholder {
+  color: #aaa;
+}
+
+.add-task-card button {
+  background: #6C63FF;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 8px 18px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.add-task-card button:hover {
+  background: #5A52D5;
+  transform: scale(1.02);
+}
+
+/* فیلترها */
+.filter-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.filter-tab {
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: none;
+  font-size: 13px;
+  cursor: pointer;
+  background: transparent;
+  color: #888;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.filter-tab.active {
+  background: #6C63FF;
+  color: white;
+}
+
+.filter-tab:hover:not(.active) {
+  background: #f0f0f5;
+}
+
+/* لیست تسک‌ها */
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.task-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+
+.task-check {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.task-check.done {
+  background: #6C63FF;
+  border-color: #6C63FF;
+  color: white;
+}
+
+.task-text {
+  flex: 1;
+  font-size: 15px;
+  color: #1a1a2e;
+}
+
+.task-text.done {
+  text-decoration: line-through;
+  color: #aaa;
+}
+
+.task-delete {
+  background: none;
+  border: none;
+  color: #ddd;
+  font-size: 16px;
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: 4px;
+}
+
+.task-delete:hover {
+  color: #ff4757;
+}
+
+/* وضعیت خالی */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #aaa;
+}
+
+.empty-state .emoji {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 12px;
+}
+
+/* کارت آمار */
+.stats-card {
+  background: white;
+  border-radius: 16px;
+  padding: 16px 20px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #aaa;
+}
+
+/* تم‌های رنگی - به صورت دایره‌های کوچک */
+.theme-selector {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.theme-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.theme-dot:hover {
+  transform: scale(1.1);
+}
+
+.theme-dot.active {
+  border-color: #6C63FF;
+  box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.2);
+}
+
+.theme-dot.premium {
+  position: relative;
+}
+
+.theme-dot.premium::after {
+  content: '💎';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  font-size: 10px;
+}
+
+/* واکنش‌گرایی */
+@media (max-width: 480px) {
+  .app-container {
+    padding: 12px 12px 80px;
+  }
+}
