@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import PublicSection from '../components/PublicSection';
 import StudentSection from '../components/StudentSection';
 import BusinessSection from '../components/BusinessSection';
+import AvatarIcon from '../components/AvatarIcon';
 
 export default function Home() {
   const { user, logout, updateProfile } = useAuth();
@@ -60,13 +61,9 @@ export default function Home() {
   // ===== ✅ پریمیوم (اصلاح شده - بدون setIsPremium) =====
   const handleActivatePremium = () => {
     if (window.confirm('آیا می‌خوای نسخه پرمیوم رو فعال کنی؟ (آزمایشی)')) {
-      // آپدیت کردن user و localStorage
       updateProfile({ ...user, isPremium: true });
       localStorage.setItem('isPremium', 'true');
-      
       console.log('✅ پریمیوم فعال شد!');
-      
-      // صفحه رو رفرش کن
       window.location.reload();
     }
   };
@@ -120,6 +117,7 @@ export default function Home() {
       width: '44px',
       height: '44px',
       borderRadius: '50%',
+      overflow: 'hidden',
       background: currentTheme.gradient || currentTheme.primary,
       color: '#fff',
       display: 'flex',
@@ -450,7 +448,9 @@ export default function Home() {
 
       <div style={styles.header}>
         <div style={styles.headerLeft}>
-          <div style={styles.avatar}>{user?.name?.[0] || '👤'}</div>
+          <div style={styles.avatar}>
+            <AvatarIcon seed={user?.email} size={44} />
+          </div>
           <div style={styles.userInfo}>
             <span style={styles.userName}>{user?.name || 'کاربر'}</span>
             <span style={styles.userBadge}>

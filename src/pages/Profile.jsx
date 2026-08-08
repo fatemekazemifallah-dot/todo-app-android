@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { Link } from 'react-router-dom';
+import AvatarIcon from '../components/AvatarIcon';
 
 export default function Profile() {
   const { user, updateProfile, logout } = useAuth();
@@ -20,21 +21,12 @@ export default function Profile() {
   });
 
   useEffect(() => {
-    // گرفتن تسک‌ها از localStorage
     const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-    
-    // امروز
     const today = new Date().toDateString();
     const todayTasks = tasks.filter(t => new Date(t.createdAt).toDateString() === today);
-    
-    // کل تسک‌ها و انجام شده‌ها
     const totalTasks = tasks.length;
     const doneTasks = tasks.filter(t => t.done).length;
-    
-    // عملکرد (درصد انجام شده)
     const performance = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
-    
-    // روزهای فعال (روزهایی که حداقل یک تسک انجام شده)
     const doneDates = tasks.filter(t => t.done).map(t => new Date(t.createdAt).toDateString());
     const activeDays = new Set(doneDates).size;
 
@@ -96,14 +88,9 @@ export default function Profile() {
       width: '80px',
       height: '80px',
       borderRadius: '50%',
-      background: currentTheme.gradient || currentTheme.primary,
-      color: '#fff',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontSize: '32px',
-      fontWeight: '600',
+      overflow: 'hidden',
       margin: '0 auto 16px',
+      background: currentTheme.bg,
     },
     name: {
       fontSize: '22px',
@@ -230,7 +217,10 @@ export default function Profile() {
       </div>
 
       <div style={styles.card}>
-        <div style={styles.avatar}>{user?.name?.[0] || '👤'}</div>
+        {/* ✅ آواتار با AvatarIcon */}
+        <div style={styles.avatar}>
+          <AvatarIcon seed={user?.email} size={80} />
+        </div>
         
         {!isEditing ? (
           <>
@@ -243,7 +233,6 @@ export default function Profile() {
               {user?.isPremium && ' 💎 پرمیوم'}
             </div>
 
-            {/* ===== آمارهای واقعی ===== */}
             <div style={styles.statsGrid}>
               <div style={styles.statCard}>
                 <div style={styles.statNum}>{stats.todayTasks}</div>
@@ -297,7 +286,6 @@ export default function Profile() {
         )}
       </div>
 
-      {/* دکمه خروج */}
       <button
         style={{
           ...styles.logoutBtn,
