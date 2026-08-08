@@ -2,91 +2,61 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { Link } from 'react-router-dom';
-import AvatarSelector from '../components/AvatarSelector';
-import AvatarIcon from '../components/AvatarIcon';
 
 export default function Profile() {
-  const { user, updateProfile } = useAuth();
-  const { currentTheme, setIsPremium } = useTheme();
+  const { user, updateProfile, logout } = useAuth();
+  const { currentTheme } = useTheme();
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(user?.name || '');
   const [editEmail, setEditEmail] = useState(user?.email || '');
-  const [reminderEnabled, setReminderEnabled] = useState(false);
-  const [showAvatarSelector, setShowAvatarSelector] = useState(false);
+
+  // ===== آمارهای واقعی =====
+  const [stats, setStats] = useState({
+    todayTasks: 0,
+    performance: 0,
+    activeDays: 0,
+    totalTasks: 0,
+    doneTasks: 0,
+  });
 
   useEffect(() => {
-    if ('Notification' in window) {
-      setReminderEnabled(Notification.permission === 'granted');
-    }
+    // گرفتن تسک‌ها از localStorage
+    const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+    
+    // امروز
+    const today = new Date().toDateString();
+    const todayTasks = tasks.filter(t => new Date(t.createdAt).toDateString() === today);
+    
+    // کل تسک‌ها و انجام شده‌ها
+    const totalTasks = tasks.length;
+    const doneTasks = tasks.filter(t => t.done).length;
+    
+    // عملکرد (درصد انجام شده)
+    const performance = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
+    
+    // روزهای فعال (روزهایی که حداقل یک تسک انجام شده)
+    const doneDates = tasks.filter(t => t.done).map(t => new Date(t.createdAt).toDateString());
+    const activeDays = new Set(doneDates).size;
+
+    setStats({
+      todayTasks: todayTasks.length,
+      performance,
+      activeDays,
+      totalTasks,
+      doneTasks,
+    });
   }, []);
-
-  const requestNotificationPermission = async () => {
-    if (!('Notification' in window)) {
-      alert('مرورگر شما از اعلان پشتیبانی نمیکند');
-      return false;
-    }
-
-    try {
-      const permission = await Notification.requestPermission();
-      if (permission === 'granted') {
-        setReminderEnabled(true);
-        new Notification('🔔 TaskFlow', {
-          body: 'یادآوری‌ها با موفقیت فعال شد!',
-          icon: '✨',
-        });
-        return true;
-      } else {
-        alert('لطفاً مجوز اعلان را در مرورگر فعال کنید');
-        setReminderEnabled(false);
-        return false;
-      }
-    } catch (error) {
-      console.error('خطا:', error);
-      return false;
-    }
-  };
-
-  const toggleReminder = async () => {
-    if (reminderEnabled) {
-      setReminderEnabled(false);
-    } else {
-      await requestNotificationPermission();
-    }
-  };
 
   const handleSave = () => {
     updateProfile({ ...user, name: editName, email: editEmail });
     setIsEditing(false);
   };
 
-  const handleModeChange = (newPurpose) => {
-    updateProfile({ ...user, purpose: newPurpose });
+  const handleLogout = () => {
+    if (window.confirm('آیا مطمئنی می‌خوای خارج بشی؟')) {
+      logout();
+    }
   };
-
-  const handleAvatarSelect = (avatarData) => {
-    updateProfile({ ...user, ...avatarData });
-  };
-
-  const purposeLabels = {
-    general: '📝 عمومی',
-    student: '🎓 تحصیلی',
-    business: '💼 بیزینسی',
-  };
-
-  // تابع رندر آواتار با DiceBear
-const renderAvatar = (avatar, size = 88) => {
-  if (avatar?.image) {
-    return (
-      <img 
-        src={avatar.image} 
-        alt="avatar" 
-        style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} 
-      />
-    );
-  }
-  
-  return <AvatarIcon avatar={avatar} name={user?.name} size={size} />;
-};
 
   const styles = {
     container: {
@@ -122,61 +92,28 @@ const renderAvatar = (avatar, size = 88) => {
       textAlign: 'center',
       marginTop: '8px',
     },
-    cardMargin: {
-      marginTop: '16px',
-      textAlign: 'right',
-    },
-    avatarContainer: {
-      position: 'relative',
-      display: 'inline-block',
-      marginBottom: '16px',
-      cursor: 'pointer',
-    },
     avatar: {
-      width: '88px',
-      height: '88px',
+      width: '80px',
+      height: '80px',
       borderRadius: '50%',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      margin: '0 auto',
-      overflow: 'hidden',
       background: currentTheme.gradient || currentTheme.primary,
       color: '#fff',
-      cursor: 'pointer',
-      boxShadow: `0 8px 24px ${currentTheme.primary}30`,
-    },
-    avatarEdit: {
-      position: 'absolute',
-      bottom: 0,
-      right: 0,
-      background: currentTheme.card,
-      border: `2px solid ${currentTheme.border}`,
-      borderRadius: '50%',
-      width: '32px',
-      height: '32px',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      fontSize: '14px',
-      cursor: 'pointer',
-      boxShadow: currentTheme.shadow,
-      transition: 'all 0.2s',
-    },
-    avatarEditHover: {
-      transform: 'scale(1.1)',
+      fontSize: '32px',
+      fontWeight: '600',
+      margin: '0 auto 16px',
     },
     name: {
       fontSize: '22px',
       fontWeight: '700',
       color: currentTheme.text,
-      marginBottom: '4px',
     },
     email: {
       fontSize: '15px',
       color: currentTheme.text,
       opacity: 0.6,
-      marginBottom: '12px',
     },
     badge: {
       display: 'inline-block',
@@ -186,13 +123,13 @@ const renderAvatar = (avatar, size = 88) => {
       fontWeight: '500',
       background: currentTheme.primaryLight,
       color: currentTheme.primary,
-      marginBottom: '8px',
+      marginBottom: '16px',
     },
     statsGrid: {
       display: 'grid',
       gridTemplateColumns: 'repeat(3, 1fr)',
       gap: '12px',
-      marginTop: '24px',
+      marginTop: '16px',
     },
     statCard: {
       background: currentTheme.bg,
@@ -211,7 +148,7 @@ const renderAvatar = (avatar, size = 88) => {
       opacity: 0.4,
     },
     editBtn: {
-      marginTop: '24px',
+      marginTop: '16px',
       padding: '12px',
       borderRadius: '14px',
       border: `2px solid ${currentTheme.primary}`,
@@ -239,10 +176,6 @@ const renderAvatar = (avatar, size = 88) => {
       outline: 'none',
       boxSizing: 'border-box',
     },
-    inputFocus: {
-      borderColor: currentTheme.primary,
-      boxShadow: `0 0 0 4px ${currentTheme.primary}20`,
-    },
     saveBtn: {
       padding: '12px',
       borderRadius: '14px',
@@ -267,127 +200,27 @@ const renderAvatar = (avatar, size = 88) => {
       width: '100%',
       marginTop: '8px',
     },
-    modeSection: {
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '8px',
-      marginTop: '4px',
-    },
-    modeLabel: {
-      fontSize: '14px',
-      fontWeight: '500',
-      color: currentTheme.text,
-      opacity: 0.7,
-    },
-    modeOptions: {
-      display: 'flex',
-      gap: '8px',
-      flexWrap: 'wrap',
-    },
-    modeBtn: {
-      padding: '8px 16px',
-      borderRadius: '12px',
-      border: `2px solid ${currentTheme.border}`,
-      background: 'transparent',
-      color: currentTheme.text,
-      fontSize: '13px',
-      fontWeight: '500',
-      cursor: 'pointer',
-      transition: 'all 0.2s',
-      flex: 1,
-      minWidth: '80px',
-    },
-    modeBtnActive: {
-      borderColor: currentTheme.primary,
-      background: currentTheme.primaryLight,
-      color: currentTheme.primary,
-    },
-    settingsSection: {
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '12px',
-    },
-    settingsRow: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: '12px 4px',
-      borderBottom: `1px solid ${currentTheme.border}`,
-    },
-    settingsRowLast: {
-      borderBottom: 'none',
-    },
-    settingsLeft: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '12px',
-    },
-    settingsIcon: {
-      fontSize: '20px',
-    },
-    settingsLabel: {
-      fontSize: '15px',
-      color: currentTheme.text,
-      fontWeight: '500',
-    },
-    settingsDesc: {
-      fontSize: '12px',
-      color: currentTheme.text,
-      opacity: 0.4,
-    },
-    switch: {
-      width: '48px',
-      height: '28px',
+    logoutBtn: {
+      marginTop: '20px',
+      padding: '12px',
       borderRadius: '14px',
-      background: currentTheme.border,
-      cursor: 'pointer',
-      position: 'relative',
-      transition: 'all 0.3s',
-    },
-    switchOn: {
-      background: currentTheme.primary,
-    },
-    switchDot: {
-      width: '22px',
-      height: '22px',
-      borderRadius: '50%',
-      background: '#fff',
-      position: 'absolute',
-      top: '3px',
-      left: '3px',
-      transition: 'all 0.3s',
-    },
-    switchDotOn: {
-      left: '23px',
-    },
-    premiumStatus: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '8px',
-    },
-    premiumBadge: {
-      background: '#F9A825',
-      color: '#000',
-      padding: '2px 12px',
-      borderRadius: '12px',
-      fontSize: '12px',
-      fontWeight: '700',
-    },
-    premiumBtn: {
-      padding: '6px 16px',
-      borderRadius: '12px',
-      border: 'none',
-      background: '#F9A825',
-      color: '#000',
-      fontSize: '12px',
+      border: `2px solid #ff4757`,
+      background: 'transparent',
+      color: '#ff4757',
+      fontSize: '15px',
       fontWeight: '600',
       cursor: 'pointer',
+      width: '100%',
+      transition: 'all 0.2s',
+    },
+    logoutBtnHover: {
+      background: '#ff4757',
+      color: '#fff',
     },
   };
 
   const [isHoverEdit, setIsHoverEdit] = useState(false);
-  const [focusInput, setFocusInput] = useState(false);
-  const [isHoverAvatar, setIsHoverAvatar] = useState(false);
+  const [isHoverLogout, setIsHoverLogout] = useState(false);
 
   return (
     <div style={styles.container}>
@@ -397,26 +230,8 @@ const renderAvatar = (avatar, size = 88) => {
       </div>
 
       <div style={styles.card}>
-        <div style={styles.avatarContainer}>
-          <div 
-            style={styles.avatar}
-            onClick={() => setShowAvatarSelector(true)}
-            onMouseEnter={() => setIsHoverAvatar(true)}
-            onMouseLeave={() => setIsHoverAvatar(false)}
-          >
-            {renderAvatar(user?.avatar, 88)}
-          </div>
-          <div 
-            style={{
-              ...styles.avatarEdit,
-              ...(isHoverAvatar ? styles.avatarEditHover : {}),
-            }}
-            onClick={() => setShowAvatarSelector(true)}
-          >
-            📷
-          </div>
-        </div>
-
+        <div style={styles.avatar}>{user?.name?.[0] || '👤'}</div>
+        
         {!isEditing ? (
           <>
             <div style={styles.name}>{user?.name || 'کاربر'}</div>
@@ -428,17 +243,18 @@ const renderAvatar = (avatar, size = 88) => {
               {user?.isPremium && ' 💎 پرمیوم'}
             </div>
 
+            {/* ===== آمارهای واقعی ===== */}
             <div style={styles.statsGrid}>
               <div style={styles.statCard}>
-                <div style={styles.statNum}>۱۲</div>
+                <div style={styles.statNum}>{stats.todayTasks}</div>
                 <div style={styles.statLabel}>تسک امروز</div>
               </div>
               <div style={styles.statCard}>
-                <div style={styles.statNum}>۸۵%</div>
+                <div style={styles.statNum}>{stats.performance}%</div>
                 <div style={styles.statLabel}>عملکرد</div>
               </div>
               <div style={styles.statCard}>
-                <div style={styles.statNum}>۷</div>
+                <div style={styles.statNum}>{stats.activeDays}</div>
                 <div style={styles.statLabel}>روز فعال</div>
               </div>
             </div>
@@ -457,21 +273,11 @@ const renderAvatar = (avatar, size = 88) => {
           </>
         ) : (
           <>
-            <div style={{ textAlign: 'right', marginBottom: '16px' }}>
-              <span style={{ fontSize: '14px', color: currentTheme.primary, fontWeight: '600' }}>
-                ✏️ ویرایش اطلاعات
-              </span>
-            </div>
             <input
               type="text"
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
-              onFocus={() => setFocusInput(true)}
-              onBlur={() => setFocusInput(false)}
-              style={{
-                ...styles.input,
-                ...(focusInput ? styles.inputFocus : {}),
-              }}
+              style={styles.input}
               placeholder="نام کامل"
             />
             <input
@@ -491,97 +297,18 @@ const renderAvatar = (avatar, size = 88) => {
         )}
       </div>
 
-      <div style={{ ...styles.card, ...styles.cardMargin }}>
-        <div style={styles.modeSection}>
-          <span style={styles.modeLabel}>🔄 حالت استفاده</span>
-          <div style={styles.modeOptions}>
-            {['general', 'student', 'business'].map((mode) => (
-              <button
-                key={mode}
-                style={{
-                  ...styles.modeBtn,
-                  ...(user?.purpose === mode ? styles.modeBtnActive : {}),
-                }}
-                onClick={() => handleModeChange(mode)}
-              >
-                {purposeLabels[mode]}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div style={{ ...styles.card, ...styles.cardMargin }}>
-        <div style={styles.settingsSection}>
-          <div style={styles.settingsRow}>
-            <div style={styles.settingsLeft}>
-              <span style={styles.settingsIcon}>🔔</span>
-              <div>
-                <div style={styles.settingsLabel}>یادآوری‌ها</div>
-                <div style={styles.settingsDesc}>
-                  {reminderEnabled ? 'فعال ✅' : 'غیرفعال'}
-                </div>
-              </div>
-            </div>
-            <div
-              style={{
-                ...styles.switch,
-                ...(reminderEnabled ? styles.switchOn : {}),
-              }}
-              onClick={toggleReminder}
-            >
-              <div
-                style={{
-                  ...styles.switchDot,
-                  ...(reminderEnabled ? styles.switchDotOn : {}),
-                }}
-              />
-            </div>
-          </div>
-
-          <div style={{ ...styles.settingsRow, ...styles.settingsRowLast }}>
-            <div style={styles.settingsLeft}>
-              <span style={styles.settingsIcon}>💎</span>
-              <div>
-                <div style={styles.settingsLabel}>
-                  {user?.isPremium ? 'نسخه پرمیوم' : 'نسخه رایگان'}
-                </div>
-                <div style={styles.settingsDesc}>
-                  {user?.isPremium
-                    ? '✅ همه تم‌ها و امکانات فعال است'
-                    : 'تم‌های ویژه + امکانات بیشتر'}
-                </div>
-              </div>
-            </div>
-            <div style={styles.premiumStatus}>
-              {user?.isPremium ? (
-                <span style={styles.premiumBadge}>فعال</span>
-              ) : (
-                <button
-                  style={styles.premiumBtn}
-                  onClick={() => {
-                    if (window.confirm('آیا می‌خوای نسخه پرمیوم رو فعال کنی؟ (آزمایشی)')) {
-                      setIsPremium(true);
-                      updateProfile({ ...user, isPremium: true });
-                    }
-                  }}
-                >
-                  فعال‌سازی
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* مودال انتخاب آواتار */}
-      {showAvatarSelector && (
-        <AvatarSelector
-          currentAvatar={user?.avatar}
-          onSelect={handleAvatarSelect}
-          onClose={() => setShowAvatarSelector(false)}
-        />
-      )}
+      {/* دکمه خروج */}
+      <button
+        style={{
+          ...styles.logoutBtn,
+          ...(isHoverLogout ? styles.logoutBtnHover : {}),
+        }}
+        onMouseEnter={() => setIsHoverLogout(true)}
+        onMouseLeave={() => setIsHoverLogout(false)}
+        onClick={handleLogout}
+      >
+        🚪 خروج از حساب
+      </button>
     </div>
   );
 }
