@@ -201,7 +201,7 @@ export default function Login() {
         <div style={styles.logoContainer}>
           <div style={styles.logoIcon}>✨</div>
           <div style={styles.logoText}>
-            Task<span style={styles.logoHighlight}>Flow</span>
+            flow<span style={styles.logoHighlight}>list</span>
           </div>
         </div>
 
