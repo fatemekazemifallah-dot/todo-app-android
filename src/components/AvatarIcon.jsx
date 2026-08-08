@@ -1,20 +1,17 @@
-import { getAvatarByIndex } from '../utils/avatarLibrary';
+import Avatar from 'react-avatar';
 
-export default function AvatarIcon({ seed, size = 60 }) {
-  // استفاده از seed (مثلاً ایمیل یا نام کاربر) برای انتخاب آواتار
-  const index = seed ? seed.length : 0;
-  const svg = getAvatarByIndex(index);
-
+export default function AvatarIcon({ seed, size = 60, name = 'کاربر' }) {
+  // اسم کاربر رو برای نمایش حروف اول استفاده کن
+  const displayName = name || 'کاربر';
+  
   return (
-    <div
-      dangerouslySetInnerHTML={{ __html: svg }}
+    <Avatar
+      name={displayName}
+      size={size}
+      round={true}
       style={{
-        width: size,
-        height: size,
-        borderRadius: '50%',
-        overflow: 'hidden',
-        flexShrink: 0,
-        background: '#f0f0f0',
+        fontFamily: 'Vazir, sans-serif',
+        fontWeight: 'bold',
       }}
     />
   );
