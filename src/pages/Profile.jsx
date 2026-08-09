@@ -56,7 +56,6 @@ export default function Profile() {
         const imageData = event.target.result;
         setAvatarImage(imageData);
         localStorage.setItem('user_avatar', imageData);
-        // آپدیت پروفایل با عکس
         updateProfile({ ...user, avatar: imageData });
       };
       reader.readAsDataURL(file);
@@ -109,9 +108,10 @@ export default function Profile() {
       marginTop: '8px',
     },
     avatarContainer: {
-      position: 'relative',
-      display: 'inline-block',
-      margin: '0 auto 16px',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      marginBottom: '16px',
     },
     avatar: {
       width: '80px',
@@ -121,7 +121,6 @@ export default function Profile() {
       background: currentTheme.bg,
     },
     avatarUploadBtn: {
-      display: 'inline-block',
       marginTop: '8px',
       padding: '6px 16px',
       borderRadius: '20px',
@@ -270,19 +269,17 @@ export default function Profile() {
               <AvatarIcon name={user?.name} size={80} />
             )}
           </div>
+          <label style={styles.avatarUploadBtn}>
+            📷 انتخاب عکس
+            <input
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={handleFileUpload}
+            />
+          </label>
         </div>
 
-        {/* دکمه آپلود عکس پایین آواتار */}
-        <label style={styles.avatarUploadBtn}>
-          📷 انتخاب عکس
-          <input
-            type="file"
-            accept="image/*"
-            style={{ display: 'none' }}
-            onChange={handleFileUpload}
-          />
-        </label>
-        
         {!isEditing ? (
           <>
             <div style={styles.name}>{user?.name || 'کاربر'}</div>
