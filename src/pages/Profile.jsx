@@ -10,6 +10,7 @@ export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(user?.name || '');
   const [editEmail, setEditEmail] = useState(user?.email || '');
+  const [avatarImage, setAvatarImage] = useState(null);
 
   // ===== آمارهای واقعی =====
   const [stats, setStats] = useState({
@@ -38,6 +39,29 @@ export default function Profile() {
       doneTasks,
     });
   }, []);
+
+  // ===== آپلود عکس =====
+  useEffect(() => {
+    const savedImage = localStorage.getItem('user_avatar');
+    if (savedImage) {
+      setAvatarImage(savedImage);
+    }
+  }, []);
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const imageData = event.target.result;
+        setAvatarImage(imageData);
+        localStorage.setItem('user_avatar', imageData);
+        // آپدیت پروفایل با عکس
+        updateProfile({ ...user, avatar: imageData });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSave = () => {
     updateProfile({ ...user, name: editName, email: editEmail });
@@ -84,13 +108,30 @@ export default function Profile() {
       textAlign: 'center',
       marginTop: '8px',
     },
+    avatarContainer: {
+      position: 'relative',
+      display: 'inline-block',
+      margin: '0 auto 16px',
+    },
     avatar: {
       width: '80px',
       height: '80px',
       borderRadius: '50%',
       overflow: 'hidden',
-      margin: '0 auto 16px',
       background: currentTheme.bg,
+    },
+    avatarUploadBtn: {
+      display: 'inline-block',
+      marginTop: '8px',
+      padding: '6px 16px',
+      borderRadius: '20px',
+      background: currentTheme.primaryLight,
+      color: currentTheme.primary,
+      fontSize: '13px',
+      fontWeight: '600',
+      cursor: 'pointer',
+      border: 'none',
+      transition: 'all 0.2s',
     },
     name: {
       fontSize: '22px',
@@ -217,10 +258,30 @@ export default function Profile() {
       </div>
 
       <div style={styles.card}>
-        {/* ✅ آواتار با AvatarIcon */}
-        <div style={styles.avatar}>
-          <AvatarIcon seed={user?.email} size={80} />
+        <div style={styles.avatarContainer}>
+          <div style={styles.avatar}>
+            {avatarImage ? (
+              <img
+                src={avatarImage}
+                alt="avatar"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            ) : (
+              <AvatarIcon name={user?.name} size={80} />
+            )}
+          </div>
         </div>
+
+        {/* دکمه آپلود عکس پایین آواتار */}
+        <label style={styles.avatarUploadBtn}>
+          📷 انتخاب عکس
+          <input
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={handleFileUpload}
+          />
+        </label>
         
         {!isEditing ? (
           <>
