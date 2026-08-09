@@ -662,9 +662,6 @@ export default function Home() {
           <Link to="/settings" style={styles.sidebarItem} onClick={() => setSidebarOpen(false)}>
             ⚙️ تنظیمات
           </Link>
-          <div style={styles.sidebarItem}>
-            👤 کاربر عادی
-          </div>
         </div>
 
         <div style={styles.themeSection}>
