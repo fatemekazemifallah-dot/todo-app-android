@@ -21,6 +21,41 @@ export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showEduAssistant, setShowEduAssistant] = useState(false);
 
+  // ===== درخواست مجوز اعلان =====
+  useEffect(() => {
+    if ('Notification' in window) {
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          console.log('✅ کاربر اجازه ارسال اعلان را داد!');
+        } else {
+          console.warn('❌ کاربر اجازه ارسال اعلان را نداد.');
+        }
+      });
+    }
+  }, []);
+
+  // ===== تابع ارسال اعلان از طریق سرویس‌ورکر =====
+  const sendNotification = (title, body) => {
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({
+        type: 'show-notification',
+        payload: {
+          title: title,
+          body: body,
+          icon: '/favicon.svg'
+        }
+      });
+    } else if (Notification.permission === 'granted') {
+      // اگر سرویس‌ورکر در دسترس نباشه، مستقیم اعلان بفرست
+      new Notification(title, {
+        body: body,
+        icon: '/favicon.svg'
+      });
+    } else {
+      console.warn('⚠️ نمی‌توان اعلان فرستاد: سرویس‌ورکر در دسترس نیست یا مجوز نداریم.');
+    }
+  };
+
   // ===== بارگذاری تسک‌ها =====
   useEffect(() => {
     const saved = localStorage.getItem('tasks');
@@ -34,9 +69,26 @@ export default function Home() {
   // ===== توابع تسک‌ها =====
   const addTask = () => {
     if (newTask.trim()) {
-      setTasks([...tasks, { id: Date.now(), text: newTask, done: false, createdAt: new Date().toISOString() }]);
+      const newTaskObj = { 
+        id: Date.now(), 
+        text: newTask, 
+        done: false, 
+        createdAt: new Date().toISOString() 
+      };
+      setTasks([...tasks, newTaskObj]);
       setNewTask('');
+      
+      // ===== ارسال اعلان یادآوری =====
+      // (برای تست، بعد از ۳ ثانیه یک اعلان آزمایشی می‌فرستیم)
+      setTimeout(() => {
+        sendNotification('⏰ یادآوری تسک', `زمان انجام "${newTaskObj.text}" رسیده!`);
+      }, 3000);
     }
+  };
+
+  // ===== تابع ارسال اعلان دستی (برای تست) =====
+  const sendTestNotification = () => {
+    sendNotification('🧪 اعلان تست', 'این یک اعلان آزمایشی از اپلیکیشن شماست!');
   };
 
   const toggleTask = (id) => {
@@ -51,7 +103,18 @@ export default function Home() {
   useEffect(() => {
     const handleVoiceTask = (e) => {
       if (e.detail.text) {
-        setTasks([...tasks, { id: Date.now(), text: e.detail.text, done: false, createdAt: new Date().toISOString() }]);
+        const newTaskObj = { 
+          id: Date.now(), 
+          text: e.detail.text, 
+          done: false, 
+          createdAt: new Date().toISOString() 
+        };
+        setTasks([...tasks, newTaskObj]);
+        
+        // اعلان برای تسک صوتی
+        setTimeout(() => {
+          sendNotification('🎤 تسک صوتی اضافه شد', `"${newTaskObj.text}" به لیست اضافه شد!`);
+        }, 2000);
       }
     };
     window.addEventListener('addTaskFromVoice', handleVoiceTask);
@@ -553,6 +616,28 @@ export default function Home() {
           <div style={styles.statLabel}>باقی‌مانده</div>
         </div>
       </div>
+
+      {/* ===== دکمه تست اعلان (برای تست) ===== */}
+      <button
+        onClick={sendTestNotification}
+        style={{
+          width: '100%',
+          padding: '12px',
+          marginTop: '12px',
+          borderRadius: '14px',
+          border: 'none',
+          background: currentTheme.primary,
+          color: '#fff',
+          fontSize: '14px',
+          fontWeight: '600',
+          cursor: 'pointer',
+          boxShadow: `0 4px 16px ${currentTheme.primary}40`,
+        }}
+        onMouseEnter={(e) => e.target.style.transform = 'scale(1.02)'}
+        onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+      >
+        🔔 تست اعلان
+      </button>
 
       {/* ===== تبلیغات یکتانت ===== */}
       <div className="yn-bnr" id="ynpos-19950"></div>
