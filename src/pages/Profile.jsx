@@ -67,6 +67,13 @@ export default function Profile() {
     setIsEditing(false);
   };
 
+  const handleModeChange = (newPurpose) => {
+    if (window.confirm(`آیا می‌خوای حالت رو به "${newPurpose === 'general' ? 'عمومی' : newPurpose === 'student' ? 'تحصیلی' : 'بیزینسی'}" تغییر بدی؟`)) {
+      updateProfile({ ...user, purpose: newPurpose });
+      window.location.reload();
+    }
+  };
+
   const handleLogout = () => {
     if (window.confirm('آیا مطمئنی می‌خوای خارج بشی؟')) {
       logout();
@@ -173,6 +180,44 @@ export default function Profile() {
       fontSize: '12px',
       color: currentTheme.text,
       opacity: 0.4,
+    },
+    // ===== استایل‌های تغییر حالت =====
+    modeSection: {
+      marginTop: '20px',
+      paddingTop: '16px',
+      borderTop: `1px solid ${currentTheme.border}`,
+    },
+    modeLabel: {
+      fontSize: '14px',
+      fontWeight: '500',
+      color: currentTheme.text,
+      opacity: 0.6,
+      display: 'block',
+      marginBottom: '12px',
+    },
+    modeOptions: {
+      display: 'flex',
+      gap: '8px',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+    },
+    modeBtn: {
+      padding: '8px 16px',
+      borderRadius: '12px',
+      border: `2px solid ${currentTheme.border}`,
+      background: 'transparent',
+      color: currentTheme.text,
+      fontSize: '14px',
+      fontWeight: '500',
+      cursor: 'pointer',
+      transition: 'all 0.2s',
+      flex: 1,
+      minWidth: '80px',
+    },
+    modeBtnActive: {
+      borderColor: currentTheme.primary,
+      background: currentTheme.primaryLight,
+      color: currentTheme.primary,
     },
     editBtn: {
       marginTop: '16px',
@@ -303,6 +348,27 @@ export default function Profile() {
               <div style={styles.statCard}>
                 <div style={styles.statNum}>{stats.activeDays}</div>
                 <div style={styles.statLabel}>روز فعال</div>
+              </div>
+            </div>
+
+            {/* ===== تغییر حالت استفاده ===== */}
+            <div style={styles.modeSection}>
+              <span style={styles.modeLabel}>🔄 حالت استفاده</span>
+              <div style={styles.modeOptions}>
+                {['general', 'student', 'business'].map((mode) => (
+                  <button
+                    key={mode}
+                    style={{
+                      ...styles.modeBtn,
+                      ...(user?.purpose === mode ? styles.modeBtnActive : {}),
+                    }}
+                    onClick={() => handleModeChange(mode)}
+                  >
+                    {mode === 'general' && '📝 عمومی'}
+                    {mode === 'student' && '🎓 تحصیلی'}
+                    {mode === 'business' && '💼 بیزینسی'}
+                  </button>
+                ))}
               </div>
             </div>
 
