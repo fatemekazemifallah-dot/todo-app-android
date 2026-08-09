@@ -181,7 +181,7 @@ export default function Profile() {
       color: currentTheme.text,
       opacity: 0.4,
     },
-    // ===== استایل‌های تغییر حالت =====
+    // ===== بخش تغییر حالت =====
     modeSection: {
       marginTop: '20px',
       paddingTop: '16px',
