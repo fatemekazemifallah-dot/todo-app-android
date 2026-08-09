@@ -4,13 +4,12 @@ import { useTheme, themes } from '../context/ThemeContext';
 import { Link } from 'react-router-dom';
 
 export default function Settings() {
-  const { user, logout } = useAuth();
+  const { user, logout, updateProfile } = useAuth();
   const { currentTheme, theme, changeTheme, isThemePremium, setIsPremium } = useTheme();
 
   const [reminderEnabled, setReminderEnabled] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
 
-  // ✅ ترتیب جدید: نقره‌ای جای بنفش
   const allThemes = ['light', 'dark', 'silver', 'blue', 'green', 'gold', 'pink', 'purple', 'navy', 'barbie', 'lime', 'beige'];
   
   const themeNames = {
@@ -140,7 +139,6 @@ export default function Settings() {
     switchDotOn: {
       left: '23px',
     },
-    // ✅ بخش تم‌ها
     themeGrid: {
       display: 'grid',
       gridTemplateColumns: 'repeat(4, 1fr)',
@@ -215,7 +213,6 @@ export default function Settings() {
         <span style={styles.title}>تنظیمات</span>
       </div>
 
-      {/* ✅ بخش انتخاب تم - جدید */}
       <div style={styles.section}>
         <div style={styles.sectionTitle}>🎨 انتخاب تم</div>
         <div style={styles.card}>
@@ -260,7 +257,6 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* بخش تنظیمات برنامه */}
       <div style={styles.section}>
         <div style={styles.sectionTitle}>⚙️ تنظیمات برنامه</div>
         <div style={styles.card}>
@@ -314,7 +310,6 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* بخش حساب کاربری */}
       <div style={styles.section}>
         <div style={styles.sectionTitle}>👤 حساب کاربری</div>
         <div style={styles.card}>
@@ -337,6 +332,7 @@ export default function Settings() {
             </span>
           </div>
 
+          {/* ===== تغییر حالت استفاده ===== */}
           <div style={{ ...styles.row, ...styles.rowLast }}>
             <div style={styles.rowLeft}>
               <span style={styles.rowIcon}>📊</span>
@@ -349,17 +345,34 @@ export default function Settings() {
                 </div>
               </div>
             </div>
-            <Link
-              to="/profile"
-              style={{
-                color: currentTheme.primary,
-                textDecoration: 'none',
-                fontSize: '13px',
-                fontWeight: '500',
-              }}
-            >
-              تغییر
-            </Link>
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+              {['general', 'student', 'business'].map((mode) => (
+                <button
+                  key={mode}
+                  onClick={() => {
+                    if (window.confirm(`آیا می‌خوای حالت رو به "${mode === 'general' ? 'عمومی' : mode === 'student' ? 'تحصیلی' : 'بیزینسی'}" تغییر بدی؟`)) {
+                      updateProfile({ ...user, purpose: mode });
+                      window.location.reload();
+                    }
+                  }}
+                  style={{
+                    padding: '4px 12px',
+                    borderRadius: '12px',
+                    border: user?.purpose === mode ? `2px solid ${currentTheme.primary}` : `2px solid ${currentTheme.border}`,
+                    background: user?.purpose === mode ? currentTheme.primaryLight : 'transparent',
+                    color: user?.purpose === mode ? currentTheme.primary : currentTheme.text,
+                    fontSize: '12px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    fontWeight: user?.purpose === mode ? '600' : '400',
+                  }}
+                >
+                  {mode === 'general' && '📝 عمومی'}
+                  {mode === 'student' && '🎓 تحصیلی'}
+                  {mode === 'business' && '💼 بیزینسی'}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
