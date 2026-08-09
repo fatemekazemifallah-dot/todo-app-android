@@ -213,6 +213,7 @@ export default function Settings() {
         <span style={styles.title}>تنظیمات</span>
       </div>
 
+      {/* ===== بخش تم‌ها ===== */}
       <div style={styles.section}>
         <div style={styles.sectionTitle}>🎨 انتخاب تم</div>
         <div style={styles.card}>
@@ -257,6 +258,7 @@ export default function Settings() {
         </div>
       </div>
 
+      {/* ===== بخش تنظیمات برنامه ===== */}
       <div style={styles.section}>
         <div style={styles.sectionTitle}>⚙️ تنظیمات برنامه</div>
         <div style={styles.card}>
@@ -310,6 +312,7 @@ export default function Settings() {
         </div>
       </div>
 
+      {/* ===== بخش حساب کاربری ===== */}
       <div style={styles.section}>
         <div style={styles.sectionTitle}>👤 حساب کاربری</div>
         <div style={styles.card}>
@@ -332,7 +335,7 @@ export default function Settings() {
             </span>
           </div>
 
-          {/* ===== تغییر حالت استفاده ===== */}
+          {/* ===== تغییر حالت استفاده (دکمه‌ها داخل خود تنظیمات) ===== */}
           <div style={{ ...styles.row, ...styles.rowLast }}>
             <div style={styles.rowLeft}>
               <span style={styles.rowIcon}>📊</span>
@@ -376,6 +379,7 @@ export default function Settings() {
           </div>
         </div>
 
+        {/* ===== دکمه خروج ===== */}
         <button
           style={{
             ...styles.dangerBtn,
