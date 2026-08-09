@@ -21,7 +21,6 @@ const dailyChallenges = [
 export default function PublicSection() {
   const { user } = useAuth();
   const { currentTheme } = useTheme();
-  const isPremium = user?.isPremium || false;
   
   const [challenges, setChallenges] = useState([]);
   const [doneChallenges, setDoneChallenges] = useState([]);
@@ -84,10 +83,8 @@ export default function PublicSection() {
     return () => clearInterval(interval);
   }, []);
 
-  // ===== پس‌زمینه پویا (پریمیوم) =====
+  // ===== پس‌زمینه پویا (حالا برای همه) =====
   const getDynamicBackground = () => {
-    if (!isPremium) return currentTheme.bg;
-    
     const hour = currentTime.getHours();
     if (hour >= 6 && hour < 12) {
       return 'linear-gradient(135deg, #fdfcfb, #e2d1c3)';
@@ -100,13 +97,8 @@ export default function PublicSection() {
     }
   };
 
-  // ===== دستیار صوتی (پریمیوم) =====
+  // ===== دستیار صوتی (حالا برای همه) =====
   const startVoiceAssistant = () => {
-    if (!isPremium) {
-      alert('🔒 این قابلیت فقط برای کاربران پریمیوم است!');
-      return;
-    }
-    
     // چک کردن پشتیبانی مرورگر
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
       alert('❌ مرورگر شما از دستیار صوتی پشتیبانی نمیکند. لطفاً از Chrome استفاده کنید.');
@@ -205,7 +197,7 @@ export default function PublicSection() {
   // ===== استایل‌ها =====
   const styles = {
     container: {
-      background: isPremium ? getDynamicBackground() : currentTheme.bg,
+      background: getDynamicBackground(),
       borderRadius: '16px',
       padding: '20px',
       marginBottom: '16px',
@@ -224,8 +216,8 @@ export default function PublicSection() {
     },
     premiumBadge: {
       fontSize: '11px',
-      background: '#F9A825',
-      color: '#000',
+      background: currentTheme.primary,
+      color: '#fff',
       padding: '2px 10px',
       borderRadius: '12px',
       fontWeight: '700',
@@ -234,8 +226,8 @@ export default function PublicSection() {
       padding: '10px 16px',
       borderRadius: '12px',
       border: `2px solid ${currentTheme.primary}`,
-      background: isPremium ? currentTheme.primary : 'transparent',
-      color: isPremium ? '#fff' : currentTheme.primary,
+      background: showProPlan ? currentTheme.primary : 'transparent',
+      color: showProPlan ? '#fff' : currentTheme.primary,
       fontSize: '14px',
       fontWeight: '700',
       cursor: 'pointer',
@@ -286,7 +278,6 @@ export default function PublicSection() {
       borderColor: currentTheme.primary,
       color: '#fff',
     },
-    // ✅ قفسه کارها با کادر خوشگل
     shelfGrid: {
       display: 'grid',
       gridTemplateColumns: 'repeat(2, 1fr)',
@@ -306,7 +297,7 @@ export default function PublicSection() {
       alignItems: 'center',
       justifyContent: 'center',
       position: 'relative',
-      border: `2px solid ${currentTheme.primary}30`, // ✅ کادر خوشگل
+      border: `2px solid ${currentTheme.primary}30`,
     },
     shelfCardHover: {
       transform: 'scale(1.02)',
@@ -358,17 +349,15 @@ export default function PublicSection() {
       fontSize: '14px',
       cursor: 'pointer',
     },
-    // ✅ دکمه صوتی با استایل جدید
     voiceBtn: {
       padding: '10px 16px',
       borderRadius: '12px',
       border: `2px solid ${currentTheme.primary}`,
-      background: isPremium ? currentTheme.primary : currentTheme.bg,
-      color: isPremium ? '#fff' : currentTheme.text,
+      background: currentTheme.primary,
+      color: '#fff',
       fontSize: '14px',
       fontWeight: '600',
-      cursor: isPremium ? 'pointer' : 'not-allowed',
-      opacity: isPremium ? 1 : 0.5,
+      cursor: 'pointer',
       width: '100%',
       marginTop: '10px',
       transition: 'all 0.2s',
@@ -401,7 +390,7 @@ export default function PublicSection() {
     <div style={styles.container}>
       <div style={styles.title}>
         <span>✨ بخش عمومی</span>
-        {isPremium && <span style={styles.premiumBadge}>💎 پرمیوم</span>}
+        <span style={styles.premiumBadge}>🎉 رایگان</span>
       </div>
 
       {/* چالش‌های روزانه */}
@@ -448,26 +437,19 @@ export default function PublicSection() {
         })}
       </div>
 
-      {/* دکمه پلن حرفه‌ای */}
+      {/* دکمه پلن حرفه‌ای - حالا برای همه */}
       <button
         style={{
           ...styles.proPlanBtn,
           ...(showProPlan ? styles.proPlanActive : {}),
         }}
-        onClick={() => {
-          if (!isPremium) {
-            alert('🔒 برای استفاده از پلن حرفه‌ای باید پریمیوم باشید!');
-            return;
-          }
-          setShowProPlan(!showProPlan);
-        }}
+        onClick={() => setShowProPlan(!showProPlan)}
       >
         {showProPlan ? '📚 بستن پلن حرفه‌ای' : '🚀 پلن حرفه‌ای'}
-        {!isPremium && ' 🔒'}
       </button>
 
-      {/* محتوای پلن حرفه‌ای */}
-      {showProPlan && isPremium && (
+      {/* محتوای پلن حرفه‌ای - حالا برای همه */}
+      {showProPlan && (
         <div style={styles.proPlanContent}>
           <div style={{ marginTop: '4px' }}>
             <div style={styles.shelfGrid}>
@@ -513,13 +495,14 @@ export default function PublicSection() {
             </div>
           </div>
 
+          {/* دکمه دستیار صوتی - حالا برای همه */}
           <button
             style={{
               ...styles.voiceBtn,
               ...(isListening ? styles.voiceBtnListening : {}),
             }}
             onClick={startVoiceAssistant}
-            disabled={!isPremium || isListening}
+            disabled={isListening}
           >
             {isListening ? '🎤 در حال گوش دادن...' : '🎤 اضافه کردن تسک با صدا'}
           </button>

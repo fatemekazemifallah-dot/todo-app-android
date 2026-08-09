@@ -20,9 +20,11 @@ export const AuthProvider = ({ children }) => {
       const savedUser = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
       if (savedUser) {
         const parsedUser = JSON.parse(savedUser);
-        setUser(parsedUser);
+        // اطمینان از پریمیوم بودن کاربر
+        const premiumUser = { ...parsedUser, isPremium: true };
+        setUser(premiumUser);
         setIsAuthenticated(true);
-        console.log('✅ کاربر پیدا شد:', parsedUser.email);
+        console.log('✅ کاربر پیدا شد:', premiumUser.email);
       } else {
         console.log('ℹ️ کاربری پیدا نشد');
       }
@@ -54,7 +56,7 @@ export const AuthProvider = ({ children }) => {
         password: userData.password,
         gender: userData.gender || '',
         purpose: userData.purpose || 'general',
-        isPremium: false,
+        isPremium: true, // ✅ همه کاربران پریمیوم هستن
         avatar: getRandomAvatar(),
         avatarType: 'sticker',
         createdAt: new Date().toISOString(),
@@ -66,9 +68,10 @@ export const AuthProvider = ({ children }) => {
       setUser(newUser);
       setIsAuthenticated(true);
       localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(newUser));
-      
+      localStorage.setItem('isPremium', 'true'); // ✅ ذخیره پریمیوم
+            
       console.log('✅ ثبت‌نام موفق:', newUser.email);
-      alert('✅ ثبت‌نام موفق!');
+      alert('✅ ثبت‌نام موفق! شما به‌صورت خودکار پریمیوم هستید 🎉');
       return true;
     } catch (error) {
       console.error('❌ خطا در ثبت‌نام:', error);
@@ -90,10 +93,13 @@ export const AuthProvider = ({ children }) => {
       const foundUser = users.find(u => u.email === email && u.password === password);
       
       if (foundUser) {
-        setUser(foundUser);
+        // اطمینان از پریمیوم بودن کاربر
+        const premiumUser = { ...foundUser, isPremium: true };
+        setUser(premiumUser);
         setIsAuthenticated(true);
-        localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(foundUser));
-        console.log('✅ ورود موفق:', foundUser.email);
+        localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(premiumUser));
+        localStorage.setItem('isPremium', 'true'); // ✅ ذخیره پریمیوم
+        console.log('✅ ورود موفق:', premiumUser.email);
         return true;
       } else {
         alert('❌ ایمیل یا رمز عبور اشتباه است!');
@@ -115,21 +121,17 @@ export const AuthProvider = ({ children }) => {
     console.log('🚪 خروج انجام شد');
   };
 
-  // ===== ✅ به‌روزرسانی پروفایل (اصلاح شده) =====
+  // ===== به‌روزرسانی پروفایل =====
   const updateProfile = (userData) => {
     try {
-      const updatedUser = { ...user, ...userData };
+      const updatedUser = { ...user, ...userData, isPremium: true }; // ✅ همیشه پریمیوم
       
       // آپدیت کردن user در state
       setUser(updatedUser);
       
       // ذخیره در localStorage
       localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(updatedUser));
-
-      // همگام‌سازی پریمیوم با localStorage
-      if (userData.isPremium !== undefined) {
-        localStorage.setItem('isPremium', String(userData.isPremium));
-      }
+      localStorage.setItem('isPremium', 'true'); // ✅ همیشه پریمیوم
 
       // به‌روزرسانی در لیست کاربران
       const storedUsers = localStorage.getItem(STORAGE_KEYS.USERS);

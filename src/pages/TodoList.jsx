@@ -4,7 +4,7 @@ import { useTheme, themes } from '../context/ThemeContext';
 
 export default function TodoList() {
   const { user, logout } = useAuth();
-  const { currentTheme, theme, changeTheme, isPremium, setIsPremium, isThemePremium } = useTheme();
+  const { currentTheme, theme, changeTheme, isThemePremium } = useTheme();
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState('');
   const [filter, setFilter] = useState('all');
@@ -68,7 +68,6 @@ export default function TodoList() {
               {user?.purpose === 'student' && '🎓 دانشجو'}
               {user?.purpose === 'business' && '💼 بیزینس'}
               {user?.purpose === 'general' && '📝 عمومی'}
-              {user?.isPremium && ' 💎'}
             </div>
           </div>
         </div>
@@ -148,40 +147,20 @@ export default function TodoList() {
         <div style={{ fontSize: 13, color: '#aaa', marginBottom: 8 }}>انتخاب تم</div>
         <div className="theme-selector">
           {allThemes.map(t => {
-            const isPremium = isThemePremium(t);
-            const canUse = !isPremium || user?.isPremium;
             return (
               <div
                 key={t}
-                className={`theme-dot ${theme === t ? 'active' : ''} ${isPremium ? 'premium' : ''}`}
+                className={`theme-dot ${theme === t ? 'active' : ''}`}
                 style={{
                   background: themeColors[t],
-                  opacity: canUse ? 1 : 0.3,
-                  cursor: canUse ? 'pointer' : 'not-allowed',
+                  cursor: 'pointer',
                 }}
-                onClick={() => canUse && changeTheme(t)}
-                title={isPremium ? `${t} (پریمیوم)` : t}
+                onClick={() => changeTheme(t)}
+                title={t}
               />
             );
           })}
         </div>
-        {!user?.isPremium && (
-          <button
-            onClick={() => setIsPremium(true)}
-            style={{
-              marginTop: 10,
-              background: 'none',
-              border: '1px dashed #6C63FF',
-              color: '#6C63FF',
-              padding: '4px 16px',
-              borderRadius: 20,
-              fontSize: 12,
-              cursor: 'pointer',
-            }}
-          >
-            فعال‌سازی پرمیوم (آزمایشی)
-          </button>
-        )}
       </div>
     </div>
   );

@@ -51,7 +51,6 @@ const EduSection = styled.div`
 export default function StudentSection() {
   const { user } = useAuth();
   const { currentTheme } = useTheme();
-  const isPremium = user?.isPremium || false;
 
   const [activeTab, setActiveTab] = useState('pomodoro');
 
@@ -72,10 +71,10 @@ export default function StudentSection() {
     { id: 'nature', name: '🌿 طبیعت', url: '/audio/nature.mp3', premium: false },
     { id: 'ocean', name: '🌊 اقیانوس', url: '/audio/ocean.mp3', premium: false },
     { id: 'rain', name: '🌧 باران', url: '/audio/rain.mp3', premium: false },
-    { id: 'calm', name: '🧘 آرامش‌بخش', url: '/audio/calm.mp3', premium: true },
-    { id: 'guitar', name: '🎸 گیتار آرام', url: '/audio/guitar.mp3', premium: true },
-    { id: 'harmonica', name: '🎵 هارمونیکا', url: '/audio/harmonica.mp3', premium: true },
-    { id: 'santoor', name: '🎹 سنتور', url: '/audio/santoor.mp3', premium: true },
+    { id: 'calm', name: '🧘 آرامش‌بخش', url: '/audio/calm.mp3', premium: false },
+    { id: 'guitar', name: '🎸 گیتار آرام', url: '/audio/guitar.mp3', premium: false },
+    { id: 'harmonica', name: '🎵 هارمونیکا', url: '/audio/harmonica.mp3', premium: false },
+    { id: 'santoor', name: '🎹 سنتور', url: '/audio/santoor.mp3', premium: false },
   ];
 
   // ===== برنامه هفتگی =====
@@ -287,9 +286,8 @@ export default function StudentSection() {
   // ===== حالت تمرکز =====
   const toggleFocusMode = () => setFocusMode(!focusMode);
 
-  // ===== قفل گوشی =====
+  // ===== قفل گوشی (حالا برای همه) =====
   const startLockTimer = () => {
-    if (!isPremium) return;
     const minutes = parseInt(prompt('مدت زمان قفل (دقیقه):', '25'));
     if (minutes > 0) {
       setLockTimer({ isActive: true, timeLeft: minutes * 60 });
@@ -373,14 +371,8 @@ export default function StudentSection() {
     );
   };
 
-  // ===== پریمیوم =====
-  const handleActivatePremium = () => {
-    if (window.confirm('آیا می‌خوای نسخه پرمیوم رو فعال کنی؟ (آزمایشی)')) {
-      const { updateProfile } = useAuth();
-      updateProfile({ ...user, isPremium: true });
-      window.location.reload();
-    }
-  };
+  // ===== حذف توابع پریمیوم =====
+  // تابع handleActivatePremium حذف شد
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
@@ -814,9 +806,7 @@ export default function StudentSection() {
       <EduSection bg={currentTheme.card} shadow={currentTheme.shadow}>
         <div style={styles.title}>
           <span>📚 ابزارهای دانشجویی</span>
-          <span style={{ fontSize: '12px', opacity: 0.5 }}>
-            {isPremium ? '💎 پرمیوم' : '🆓 رایگان'}
-          </span>
+          <span style={{ fontSize: '12px', opacity: 0.5 }}>🎉 رایگان</span>
         </div>
 
         <div style={styles.tabs}>
@@ -877,47 +867,38 @@ export default function StudentSection() {
           </div>
         )}
 
-        {/* ===== برنامه هفتگی (پریمیوم) ===== */}
+        {/* ===== برنامه هفتگی (حالا برای همه) ===== */}
         {activeTab === 'schedule' && (
           <div>
-            {!isPremium ? (
-              <div style={styles.premiumLock}>
-                🔒 برنامه هفتگی دروس یک قابلیت پریمیوم است
-                <button style={styles.premiumLockBtn} onClick={handleActivatePremium}>فعال‌سازی</button>
+            {weeklySchedule.length === 0 ? (
+              <div style={{ textAlign: 'center', opacity: 0.5, padding: '16px 0' }}>📅 هیچ درسی برنامه‌ریزی نشده</div>
+            ) : (
+              weeklySchedule.map(item => (
+                <div key={item.id} style={styles.scheduleItem}>
+                  <div style={styles.scheduleInfo}>
+                    <span style={styles.scheduleDay}>{item.day}</span>
+                    <span style={styles.scheduleName}>{item.name}</span>
+                    <span style={styles.scheduleTime}>⏰ {item.time}</span>
+                  </div>
+                  <button style={styles.examDelete} onClick={() => deleteSchedule(item.id)}>✕</button>
+                </div>
+              ))
+            )}
+            {showScheduleForm ? (
+              <div style={{ marginTop: '12px' }}>
+                <select value={newSchedule.day} onChange={(e) => setNewSchedule({ ...newSchedule, day: e.target.value })} style={styles.formInput}>
+                  <option value="">روز</option>
+                  {days.map(d => <option key={d} value={d}>{d}</option>)}
+                </select>
+                <input type="text" placeholder="نام درس" value={newSchedule.name} onChange={(e) => setNewSchedule({ ...newSchedule, name: e.target.value })} style={styles.formInput} />
+                <input type="time" value={newSchedule.time} onChange={(e) => setNewSchedule({ ...newSchedule, time: e.target.value })} style={styles.formInput} />
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button style={styles.formBtn} onClick={addSchedule}>➕ اضافه</button>
+                  <button style={styles.formBtnCancel} onClick={() => setShowScheduleForm(false)}>لغو</button>
+                </div>
               </div>
             ) : (
-              <>
-                {weeklySchedule.length === 0 ? (
-                  <div style={{ textAlign: 'center', opacity: 0.5, padding: '16px 0' }}>📅 هیچ درسی برنامه‌ریزی نشده</div>
-                ) : (
-                  weeklySchedule.map(item => (
-                    <div key={item.id} style={styles.scheduleItem}>
-                      <div style={styles.scheduleInfo}>
-                        <span style={styles.scheduleDay}>{item.day}</span>
-                        <span style={styles.scheduleName}>{item.name}</span>
-                        <span style={styles.scheduleTime}>⏰ {item.time}</span>
-                      </div>
-                      <button style={styles.examDelete} onClick={() => deleteSchedule(item.id)}>✕</button>
-                    </div>
-                  ))
-                )}
-                {showScheduleForm ? (
-                  <div style={{ marginTop: '12px' }}>
-                    <select value={newSchedule.day} onChange={(e) => setNewSchedule({ ...newSchedule, day: e.target.value })} style={styles.formInput}>
-                      <option value="">روز</option>
-                      {days.map(d => <option key={d} value={d}>{d}</option>)}
-                    </select>
-                    <input type="text" placeholder="نام درس" value={newSchedule.name} onChange={(e) => setNewSchedule({ ...newSchedule, name: e.target.value })} style={styles.formInput} />
-                    <input type="time" value={newSchedule.time} onChange={(e) => setNewSchedule({ ...newSchedule, time: e.target.value })} style={styles.formInput} />
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <button style={styles.formBtn} onClick={addSchedule}>➕ اضافه</button>
-                      <button style={styles.formBtnCancel} onClick={() => setShowScheduleForm(false)}>لغو</button>
-                    </div>
-                  </div>
-                ) : (
-                  <button style={{ ...styles.btn, ...styles.btnPrimary, width: '100%', marginTop: '8px' }} onClick={() => setShowScheduleForm(true)}>➕ افزودن درس به برنامه</button>
-                )}
-              </>
+              <button style={{ ...styles.btn, ...styles.btnPrimary, width: '100%', marginTop: '8px' }} onClick={() => setShowScheduleForm(true)}>➕ افزودن درس به برنامه</button>
             )}
           </div>
         )}
@@ -951,33 +932,19 @@ export default function StudentSection() {
                 <span style={{ fontSize: '13px', color: currentTheme.text, opacity: 0.6 }}>🎵 موسیقی پس‌زمینه</span>
               </div>
               <div style={styles.musicSelector}>
-                {musicOptions.map(music => {
-                  const canUse = !music.premium || isPremium;
-                  return (
-                    <button
-                      key={music.id}
-                      style={{
-                        ...styles.musicBtn,
-                        ...(selectedMusic === music.id ? styles.musicBtnActive : {}),
-                        ...(music.premium ? styles.musicBtnPremium : {}),
-                        opacity: canUse ? 1 : 0.4,
-                        cursor: canUse ? 'pointer' : 'not-allowed',
-                      }}
-                      onClick={() => canUse && setSelectedMusic(music.id)}
-                    >
-                      {music.name}
-                      {music.premium && !isPremium && ' 🔒'}
-                      {music.premium && isPremium && ' 💎'}
-                    </button>
-                  );
-                })}
+                {musicOptions.map(music => (
+                  <button
+                    key={music.id}
+                    style={{
+                      ...styles.musicBtn,
+                      ...(selectedMusic === music.id ? styles.musicBtnActive : {}),
+                    }}
+                    onClick={() => setSelectedMusic(music.id)}
+                  >
+                    {music.name}
+                  </button>
+                ))}
               </div>
-              {!isPremium && (
-                <div style={styles.premiumLock}>
-                  🔒 ۴ موسیقی ویژه برای کاربران پریمیوم
-                  <button style={styles.premiumLockBtn} onClick={handleActivatePremium}>فعال‌سازی</button>
-                </div>
-              )}
             </div>
           </div>
         )}
@@ -1051,47 +1018,38 @@ export default function StudentSection() {
           </div>
         )}
 
-        {/* ===== یادداشت‌ها (پریمیوم) ===== */}
+        {/* ===== یادداشت‌ها (حالا برای همه) ===== */}
         {activeTab === 'notes' && (
           <div>
-            {!isPremium ? (
-              <div style={styles.premiumLock}>
-                🔒 دفترچه یادداشت درسی یک قابلیت پریمیوم است
-                <button style={styles.premiumLockBtn} onClick={handleActivatePremium}>فعال‌سازی</button>
-              </div>
+            {notes.length === 0 ? (
+              <div style={{ textAlign: 'center', opacity: 0.5, padding: '16px 0' }}>📓 هیچ یادداشتی ثبت نشده</div>
             ) : (
-              <>
-                {notes.length === 0 ? (
-                  <div style={{ textAlign: 'center', opacity: 0.5, padding: '16px 0' }}>📓 هیچ یادداشتی ثبت نشده</div>
-                ) : (
-                  notes.map(note => (
-                    <div key={note.id} style={styles.noteItem}>
-                      <div>
-                        <div style={styles.noteTitle}>{note.title}</div>
-                        <div style={styles.noteContent}>{note.content}</div>
-                        <div style={styles.noteMeta}>
-                          {note.course && `📚 ${note.course} • `}
-                          {new Date(note.createdAt).toLocaleDateString('fa-IR')}
-                        </div>
-                      </div>
-                      <button style={styles.noteDelete} onClick={() => deleteNote(note.id)}>✕</button>
-                    </div>
-                  ))
-                )}
-                {showNoteForm ? (
-                  <div style={{ marginTop: '12px' }}>
-                    <input type="text" placeholder="عنوان یادداشت" value={newNote.title} onChange={(e) => setNewNote({ ...newNote, title: e.target.value })} style={styles.formInput} />
-                    <input type="text" placeholder="نام درس (اختیاری)" value={newNote.course} onChange={(e) => setNewNote({ ...newNote, course: e.target.value })} style={styles.formInput} />
-                    <textarea placeholder="متن یادداشت..." value={newNote.content} onChange={(e) => setNewNote({ ...newNote, content: e.target.value })} style={{ ...styles.formInput, minHeight: '80px' }} />
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <button style={styles.formBtn} onClick={addNote}>➕ ذخیره</button>
-                      <button style={styles.formBtnCancel} onClick={() => setShowNoteForm(false)}>لغو</button>
+              notes.map(note => (
+                <div key={note.id} style={styles.noteItem}>
+                  <div>
+                    <div style={styles.noteTitle}>{note.title}</div>
+                    <div style={styles.noteContent}>{note.content}</div>
+                    <div style={styles.noteMeta}>
+                      {note.course && `📚 ${note.course} • `}
+                      {new Date(note.createdAt).toLocaleDateString('fa-IR')}
                     </div>
                   </div>
-                ) : (
-                  <button style={{ ...styles.btn, ...styles.btnPrimary, width: '100%', marginTop: '8px' }} onClick={() => setShowNoteForm(true)}>➕ افزودن یادداشت جدید</button>
-                )}
-              </>
+                  <button style={styles.noteDelete} onClick={() => deleteNote(note.id)}>✕</button>
+                </div>
+              ))
+            )}
+            {showNoteForm ? (
+              <div style={{ marginTop: '12px' }}>
+                <input type="text" placeholder="عنوان یادداشت" value={newNote.title} onChange={(e) => setNewNote({ ...newNote, title: e.target.value })} style={styles.formInput} />
+                <input type="text" placeholder="نام درس (اختیاری)" value={newNote.course} onChange={(e) => setNewNote({ ...newNote, course: e.target.value })} style={styles.formInput} />
+                <textarea placeholder="متن یادداشت..." value={newNote.content} onChange={(e) => setNewNote({ ...newNote, content: e.target.value })} style={{ ...styles.formInput, minHeight: '80px' }} />
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button style={styles.formBtn} onClick={addNote}>➕ ذخیره</button>
+                  <button style={styles.formBtnCancel} onClick={() => setShowNoteForm(false)}>لغو</button>
+                </div>
+              </div>
+            ) : (
+              <button style={{ ...styles.btn, ...styles.btnPrimary, width: '100%', marginTop: '8px' }} onClick={() => setShowNoteForm(true)}>➕ افزودن یادداشت جدید</button>
             )}
           </div>
         )}
@@ -1118,21 +1076,11 @@ export default function StudentSection() {
             <div style={styles.lockSection}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '14px', color: currentTheme.text, opacity: 0.7 }}>🔒 قفل گوشی هنگام مطالعه</span>
-                {isPremium ? (
-                  <button style={styles.lockBtn} onClick={startLockTimer}>
-                    {lockTimer.isActive ? `⏳ ${formatTime(lockTimer.timeLeft)}` : '🔒 قفل کن'}
-                  </button>
-                ) : (
-                  <span style={{ fontSize: '12px', color: '#F9A825', fontWeight: '600' }}>💎 پریمیوم</span>
-                )}
+                <button style={styles.lockBtn} onClick={startLockTimer}>
+                  {lockTimer.isActive ? `⏳ ${formatTime(lockTimer.timeLeft)}` : '🔒 قفل کن'}
+                </button>
               </div>
               {lockTimer.isActive && <div style={styles.lockTimerDisplay}>⏳ {formatTime(lockTimer.timeLeft)}</div>}
-              {!isPremium && (
-                <div style={styles.premiumLock}>
-                  🔒 فقط کاربران پریمیوم می‌توانند گوشی را قفل کنند
-                  <button style={styles.premiumLockBtn} onClick={handleActivatePremium}>فعال‌سازی</button>
-                </div>
-              )}
             </div>
           </div>
         )}

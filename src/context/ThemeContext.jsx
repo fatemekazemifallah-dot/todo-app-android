@@ -1,5 +1,4 @@
 import { createContext, useState, useContext, useEffect } from 'react';
-import { useAuth } from './AuthContext';
 
 const ThemeContext = createContext();
 
@@ -162,7 +161,8 @@ export const themes = {
   },
 };
 
-const premiumThemes = ['purple', 'gold', 'pink', 'navy', 'barbie', 'lime', 'beige'];
+// ✅ همه تم‌ها رایگان هستن - لیست خالی
+const premiumThemes = [];
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState('light');
@@ -177,7 +177,8 @@ export const ThemeProvider = ({ children }) => {
     localStorage.setItem('theme', themeName);
   };
 
-  const isThemePremium = (themeName) => premiumThemes.includes(themeName);
+  // ✅ همیشه false برمی‌گردونه چون هیچ تم پریمیومی نیست
+  const isThemePremium = (themeName) => false;
 
   return (
     <ThemeContext.Provider

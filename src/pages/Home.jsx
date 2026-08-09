@@ -58,16 +58,6 @@ export default function Home() {
     return () => window.removeEventListener('addTaskFromVoice', handleVoiceTask);
   }, [tasks]);
 
-  // ===== ✅ پریمیوم (اصلاح شده - بدون setIsPremium) =====
-  const handleActivatePremium = () => {
-    if (window.confirm('آیا می‌خوای نسخه پرمیوم رو فعال کنی؟ (آزمایشی)')) {
-      updateProfile({ ...user, isPremium: true });
-      localStorage.setItem('isPremium', 'true');
-      console.log('✅ پریمیوم فعال شد!');
-      window.location.reload();
-    }
-  };
-
   // ===== فیلتر تسک‌ها =====
   const filteredTasks = filter === 'today'
     ? tasks.filter(t => new Date(t.createdAt).toDateString() === new Date().toDateString())
@@ -457,7 +447,6 @@ export default function Home() {
               {user?.purpose === 'student' && '🎓 دانشجو'}
               {user?.purpose === 'business' && '💼 بیزینس'}
               {user?.purpose === 'general' && '📝 عمومی'}
-              {user?.isPremium && ' 💎'}
             </span>
           </div>
         </div>
@@ -589,7 +578,7 @@ export default function Home() {
             ⚙️ تنظیمات
           </Link>
           <div style={styles.sidebarItem}>
-            💎 {user?.isPremium ? 'کاربر پرمیوم' : 'نسخه رایگان'}
+            👤 کاربر عادی
           </div>
         </div>
 
@@ -598,7 +587,7 @@ export default function Home() {
           <div style={styles.themeDots}>
             {allThemes.map(t => {
               const isPremium = isThemePremium(t);
-              const canUse = !isPremium || user?.isPremium;
+              const canUse = true; // همه تم‌ها برای همه فعال
               return (
                 <div
                   key={t}
@@ -616,30 +605,6 @@ export default function Home() {
               );
             })}
           </div>
-
-          {!user?.isPremium && (
-            <button
-              onClick={handleActivatePremium}
-              style={{
-                marginTop: '12px',
-                padding: '10px 16px',
-                borderRadius: '12px',
-                border: 'none',
-                background: 'linear-gradient(135deg, #F9A825, #F57F17)',
-                color: '#000',
-                fontSize: '14px',
-                fontWeight: '700',
-                cursor: 'pointer',
-                width: '100%',
-                transition: 'all 0.2s',
-                boxShadow: '0 4px 12px rgba(249,168,37,0.3)',
-              }}
-              onMouseEnter={(e) => { e.target.style.transform = 'scale(1.02)'; }}
-              onMouseLeave={(e) => { e.target.style.transform = 'scale(1)'; }}
-            >
-              ✨ فعال‌سازی پرمیوم
-            </button>
-          )}
         </div>
 
         <button style={styles.logoutBtn} onClick={logout}>

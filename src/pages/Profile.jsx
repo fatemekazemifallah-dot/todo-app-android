@@ -333,7 +333,6 @@ export default function Profile() {
               {user?.purpose === 'student' && '🎓 دانشجو'}
               {user?.purpose === 'business' && '💼 بیزینس'}
               {user?.purpose === 'general' && '📝 عمومی'}
-              {user?.isPremium && ' 💎 پرمیوم'}
             </div>
 
             <div style={styles.statsGrid}>

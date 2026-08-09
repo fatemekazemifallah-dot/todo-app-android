@@ -4,20 +4,6 @@ import { useTheme } from '../context/ThemeContext';
 export default function BusinessSection() {
   const { currentTheme } = useTheme();
   
-  // ===== isPremium از localStorage =====
-  const [isPremium, setIsPremium] = useState(false);
-  
-  useEffect(() => {
-    const check = () => {
-      const val = localStorage.getItem('isPremium') === 'true';
-      setIsPremium(val);
-      console.log('🔍 BusinessSection - isPremium:', val);
-    };
-    check();
-    const interval = setInterval(check, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
   // ===== States =====
   const [projects, setProjects] = useState([]);
   const [tasks, setTasks] = useState([]);
@@ -32,8 +18,6 @@ export default function BusinessSection() {
   const [showGoalsModal, setShowGoalsModal] = useState(false);
   const [showArchiveModal, setShowArchiveModal] = useState(false);
   const [newProjectName, setNewProjectName] = useState('');
-  
-  // ===== ✅ State جدید برای اولویت تسک =====
   const [taskPriority, setTaskPriority] = useState('medium');
 
   // ===== بارگذاری =====
@@ -87,7 +71,6 @@ export default function BusinessSection() {
     }
   };
 
-  // ===== ✅ تابع addTask اصلاح شده با پارامتر priority =====
   const addTask = (projectId, title, priority = 'medium') => {
     if (title.trim()) {
       setTasks([...tasks, {
@@ -122,7 +105,7 @@ export default function BusinessSection() {
   };
 
   // ============================================
-  //  فیچرهای پریمیوم
+  //  فیچرها (همه رایگان)
   // ============================================
   const archiveProject = (id) => {
     const project = projects.find(p => p.id === id);
@@ -477,7 +460,7 @@ export default function BusinessSection() {
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
         <div style={{ fontSize: '18px', fontWeight: '700', color: currentTheme.text }}>💼 داشبورد مدیریت</div>
         <div style={{ fontSize: '12px', opacity: 0.5, color: currentTheme.text }}>
-          {isPremium ? '💎 پرمیوم' : '🆓 رایگان'}
+          🆓 رایگان
         </div>
       </div>
 
@@ -522,79 +505,75 @@ export default function BusinessSection() {
         <div style={styles.cardSub}>برنامه‌ریزی و ثبت جلسات</div>
       </div>
 
-      {/* ===== بخش پریمیوم ===== */}
-      {isPremium && (
-        <>
-          <div style={{ ...styles.mainCard, borderColor: reminders.hasReminders ? '#ef4444' : currentTheme.border }}>
-            <div style={styles.cardHeader}>
-              <span style={styles.cardTitle}>🔔 یادآوری هوشمند</span>
-              <span style={styles.premiumBadge}>💎 پریمیوم</span>
-            </div>
-            {reminders.hasReminders ? (
-              <>
-                {reminders.urgentTasks.length > 0 && (
-                  <div style={styles.reminderCard}>
-                    <strong>🔴 تسک‌های فوری:</strong> {reminders.urgentTasks.map(t => t.title).join('، ')}
-                  </div>
-                )}
-                {reminders.todayMeetings.length > 0 && (
-                  <div style={{ ...styles.reminderCard, borderRightColor: '#f59e0b' }}>
-                    <strong>📅 جلسات امروز:</strong> {reminders.todayMeetings.map(m => m.title).join('، ')}
-                  </div>
-                )}
-                {reminders.overdueTasks.length > 0 && (
-                  <div style={{ ...styles.reminderCard, borderRightColor: '#ef4444' }}>
-                    <strong>⏰ تسک‌های عقب‌افتاده:</strong> {reminders.overdueTasks.map(t => t.title).join('، ')}
-                  </div>
-                )}
-              </>
-            ) : (
-              <div style={styles.cardSub}>✅ همه چیز مرتب است! هیچ یادآوری فوری ندارید.</div>
+      {/* ===== بخش یادآوری هوشمند (رایگان) ===== */}
+      <div style={{ ...styles.mainCard, borderColor: reminders.hasReminders ? '#ef4444' : currentTheme.border }}>
+        <div style={styles.cardHeader}>
+          <span style={styles.cardTitle}>🔔 یادآوری هوشمند</span>
+          <span style={{ ...styles.premiumBadge, background: currentTheme.primary, color: '#fff' }}>✨ رایگان</span>
+        </div>
+        {reminders.hasReminders ? (
+          <>
+            {reminders.urgentTasks.length > 0 && (
+              <div style={styles.reminderCard}>
+                <strong>🔴 تسک‌های فوری:</strong> {reminders.urgentTasks.map(t => t.title).join('، ')}
+              </div>
             )}
-          </div>
+            {reminders.todayMeetings.length > 0 && (
+              <div style={{ ...styles.reminderCard, borderRightColor: '#f59e0b' }}>
+                <strong>📅 جلسات امروز:</strong> {reminders.todayMeetings.map(m => m.title).join('، ')}
+              </div>
+            )}
+            {reminders.overdueTasks.length > 0 && (
+              <div style={{ ...styles.reminderCard, borderRightColor: '#ef4444' }}>
+                <strong>⏰ تسک‌های عقب‌افتاده:</strong> {reminders.overdueTasks.map(t => t.title).join('، ')}
+              </div>
+            )}
+          </>
+        ) : (
+          <div style={styles.cardSub}>✅ همه چیز مرتب است! هیچ یادآوری فوری ندارید.</div>
+        )}
+      </div>
 
-          <div 
-            style={{ ...styles.mainCard, ...(hoverCard === 'report' ? styles.mainCardHover : {}) }}
-            onMouseEnter={() => setHoverCard('report')}
-            onMouseLeave={() => setHoverCard(null)}
-            onClick={() => setShowReportModal(true)}
-          >
-            <div style={styles.cardHeader}>
-              <span style={styles.cardTitle}>📈 گزارش سریع</span>
-              <span style={styles.premiumBadge}>💎 پریمیوم</span>
-            </div>
-            <div style={styles.cardSub}>خلاصه عملکرد هفتگی خود را ببینید</div>
-          </div>
+      <div 
+        style={{ ...styles.mainCard, ...(hoverCard === 'report' ? styles.mainCardHover : {}) }}
+        onMouseEnter={() => setHoverCard('report')}
+        onMouseLeave={() => setHoverCard(null)}
+        onClick={() => setShowReportModal(true)}
+      >
+        <div style={styles.cardHeader}>
+          <span style={styles.cardTitle}>📈 گزارش سریع</span>
+          <span style={{ ...styles.premiumBadge, background: currentTheme.primary, color: '#fff' }}>✨ رایگان</span>
+        </div>
+        <div style={styles.cardSub}>خلاصه عملکرد هفتگی خود را ببینید</div>
+      </div>
 
-          <div 
-            style={{ ...styles.mainCard, ...(hoverCard === 'goals' ? styles.mainCardHover : {}) }}
-            onMouseEnter={() => setHoverCard('goals')}
-            onMouseLeave={() => setHoverCard(null)}
-            onClick={() => setShowGoalsModal(true)}
-          >
-            <div style={styles.cardHeader}>
-              <span style={styles.cardTitle}>🎯 اهداف هفتگی</span>
-              <span style={styles.premiumBadge}>💎 پریمیوم</span>
-            </div>
-            <div style={styles.cardSub}>
-              {weeklyGoals.filter(g => g.done).length}/{weeklyGoals.length} هدف انجام شده
-            </div>
-          </div>
+      <div 
+        style={{ ...styles.mainCard, ...(hoverCard === 'goals' ? styles.mainCardHover : {}) }}
+        onMouseEnter={() => setHoverCard('goals')}
+        onMouseLeave={() => setHoverCard(null)}
+        onClick={() => setShowGoalsModal(true)}
+      >
+        <div style={styles.cardHeader}>
+          <span style={styles.cardTitle}>🎯 اهداف هفتگی</span>
+          <span style={{ ...styles.premiumBadge, background: currentTheme.primary, color: '#fff' }}>✨ رایگان</span>
+        </div>
+        <div style={styles.cardSub}>
+          {weeklyGoals.filter(g => g.done).length}/{weeklyGoals.length} هدف انجام شده
+        </div>
+      </div>
 
-          <div 
-            style={{ ...styles.mainCard, ...(hoverCard === 'archive' ? styles.mainCardHover : {}) }}
-            onMouseEnter={() => setHoverCard('archive')}
-            onMouseLeave={() => setHoverCard(null)}
-            onClick={() => setShowArchiveModal(true)}
-          >
-            <div style={styles.cardHeader}>
-              <span style={styles.cardTitle}>🗂️ آرشیو پروژه‌ها</span>
-              <span style={styles.premiumBadge}>💎 پریمیوم</span>
-            </div>
-            <div style={styles.cardSub}>{archivedProjects.length} پروژه آرشیو شده</div>
-          </div>
-        </>
-      )}
+      <div 
+        style={{ ...styles.mainCard, ...(hoverCard === 'archive' ? styles.mainCardHover : {}) }}
+        onMouseEnter={() => setHoverCard('archive')}
+        onMouseLeave={() => setHoverCard(null)}
+        onClick={() => setShowArchiveModal(true)}
+      >
+        <div style={styles.cardHeader}>
+          <span style={styles.cardTitle}>🗂️ آرشیو پروژه‌ها</span>
+          <span style={{ ...styles.premiumBadge, background: currentTheme.primary, color: '#fff' }}>✨ رایگان</span>
+        </div>
+        <div style={styles.cardSub}>{archivedProjects.length} پروژه آرشیو شده</div>
+      </div>
 
       {/* ============================================================
           مودال‌ها
@@ -633,16 +612,13 @@ export default function BusinessSection() {
                     </div>
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                       <span style={{ fontSize: '12px', opacity: 0.5 }}>{stats.total} تسک</span>
-                      {isPremium && (
-                        <button style={{ ...styles.btnSuccess, padding: '2px 8px', fontSize: '10px' }} onClick={(e) => { e.stopPropagation(); archiveProject(p.id); }}>📦</button>
-                      )}
+                      <button style={{ ...styles.btnSuccess, padding: '2px 8px', fontSize: '10px' }} onClick={(e) => { e.stopPropagation(); archiveProject(p.id); }}>📦</button>
                       <button style={styles.btnDanger} onClick={(e) => { e.stopPropagation(); deleteProject(p.id); }}>🗑️</button>
                     </div>
                   </div>
 
                   {activeProjectId === p.id && (
                     <div style={{ padding: '8px 12px 16px 12px', background: currentTheme.bg, borderRadius: '12px', marginBottom: '12px' }}>
-                      {/* ===== ✅ بخش اضافه کردن تسک با انتخاب اولویت ===== */}
                       <div style={{ display: 'flex', gap: '8px', marginBottom: '10px', flexWrap: 'wrap' }}>
                         <input
                           type="text"
@@ -769,7 +745,7 @@ export default function BusinessSection() {
         </div>
       )}
 
-      {isPremium && showReportModal && (
+      {showReportModal && (
         <div style={styles.modalOverlay} onClick={() => setShowReportModal(false)}>
           <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div style={styles.modalTitle}>📈 گزارش عملکرد</div>
@@ -786,7 +762,7 @@ export default function BusinessSection() {
         </div>
       )}
 
-      {isPremium && showGoalsModal && (
+      {showGoalsModal && (
         <div style={styles.modalOverlay} onClick={() => setShowGoalsModal(false)}>
           <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div style={styles.modalTitle}>🎯 اهداف هفتگی</div>
@@ -813,7 +789,7 @@ export default function BusinessSection() {
         </div>
       )}
 
-      {isPremium && showArchiveModal && (
+      {showArchiveModal && (
         <div style={styles.modalOverlay} onClick={() => setShowArchiveModal(false)}>
           <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div style={styles.modalTitle}>🗂️ پروژه‌های آرشیو شده</div>

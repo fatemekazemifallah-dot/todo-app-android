@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 export default function Settings() {
   const { user, logout, updateProfile } = useAuth();
-  const { currentTheme, theme, changeTheme, isThemePremium, setIsPremium } = useTheme();
+  const { currentTheme, theme, changeTheme, isThemePremium } = useTheme();
 
   const [reminderEnabled, setReminderEnabled] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -219,42 +219,23 @@ export default function Settings() {
         <div style={styles.card}>
           <div style={styles.themeGrid}>
             {allThemes.map(t => {
-              const isPremium = isThemePremium(t);
-              const canUse = !isPremium || user?.isPremium;
               return (
                 <div
                   key={t}
                   style={{
                     ...styles.themeOption,
                     ...(theme === t ? styles.themeOptionActive : {}),
-                    opacity: canUse ? 1 : 0.3,
-                    cursor: canUse ? 'pointer' : 'not-allowed',
                   }}
-                  onClick={() => canUse && changeTheme(t)}
+                  onClick={() => changeTheme(t)}
                 >
                   <div style={{ ...styles.themeColor, background: themeColors[t] }} />
                   <div style={styles.themeName}>
                     {themeNames[t]}
-                    {isPremium && ' 💎'}
                   </div>
                 </div>
               );
             })}
           </div>
-
-          {!user?.isPremium && (
-            <button
-              style={{
-                ...styles.premiumBtn,
-                ...(isHoverPremium ? styles.premiumBtnHover : {}),
-              }}
-              onMouseEnter={() => setIsHoverPremium(true)}
-              onMouseLeave={() => setIsHoverPremium(false)}
-              onClick={() => setIsPremium(true)}
-            >
-              ✨ فعال‌سازی پرمیوم (تم‌های ویژه)
-            </button>
-          )}
         </div>
       </div>
 
@@ -318,24 +299,20 @@ export default function Settings() {
         <div style={styles.card}>
           <div style={styles.row}>
             <div style={styles.rowLeft}>
-              <span style={styles.rowIcon}>💎</span>
+              <span style={styles.rowIcon}>👤</span>
               <div>
-                <div style={styles.rowLabel}>
-                  {user?.isPremium ? 'کاربر پرمیوم' : 'نسخه رایگان'}
-                </div>
+                <div style={styles.rowLabel}>کاربر عادی</div>
                 <div style={styles.rowDesc}>
-                  {user?.isPremium
-                    ? '✅ همه تم‌ها فعال است'
-                    : 'برای فعال‌سازی پرمیوم کلیک کنید'}
+                  همه امکانات در دسترس شماست
                 </div>
               </div>
             </div>
             <span style={{ fontSize: '14px', color: currentTheme.primary }}>
-              {user?.isPremium ? '✅' : '🆓'}
+              ✅
             </span>
           </div>
 
-          {/* ===== تغییر حالت استفاده (دکمه‌ها داخل خود تنظیمات) ===== */}
+          {/* ===== تغییر حالت استفاده ===== */}
           <div style={{ ...styles.row, ...styles.rowLast }}>
             <div style={styles.rowLeft}>
               <span style={styles.rowIcon}>📊</span>
