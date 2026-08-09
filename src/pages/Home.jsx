@@ -565,6 +565,10 @@ export default function Home() {
         </div>
       </div>
 
+      {/* ===== تبلیغات یکتانت ===== */}
+      <div className="yn-bnr" id="ynpos-19950"></div>
+      {/* ===== تبلیغات تموم شد ===== */}
+
       <div style={styles.sidebarOverlay} onClick={() => setSidebarOpen(false)} />
       <div style={styles.sidebar}>
         <button style={styles.sidebarClose} onClick={() => setSidebarOpen(false)}>✕</button>
