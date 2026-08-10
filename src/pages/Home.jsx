@@ -57,7 +57,6 @@ export default function Home() {
         }
       });
     } else if (Notification.permission === 'granted') {
-      // اگر سرویس‌ورکر در دسترس نباشه، مستقیم اعلان بفرست
       new Notification(title, {
         body: body,
         icon: '/favicon.svg'
@@ -89,14 +88,12 @@ export default function Home() {
       setTasks([...tasks, newTaskObj]);
       setNewTask('');
       
-      // ===== ارسال اعلان یادآوری =====
       setTimeout(() => {
         sendNotification('⏰ یادآوری تسک', `زمان انجام "${newTaskObj.text}" رسیده!`);
       }, 3000);
     }
   };
 
-  // ===== تابع ارسال اعلان دستی (برای تست) =====
   const sendTestNotification = () => {
     sendNotification('🧪 اعلان تست', 'این یک اعلان آزمایشی از اپلیکیشن شماست!');
   };
@@ -121,7 +118,6 @@ export default function Home() {
         };
         setTasks([...tasks, newTaskObj]);
         
-        // اعلان برای تسک صوتی
         setTimeout(() => {
           sendNotification('🎤 تسک صوتی اضافه شد', `"${newTaskObj.text}" به لیست اضافه شد!`);
         }, 2000);
@@ -635,7 +631,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ===== دکمه تست اعلان (برای تست) ===== */}
       <button
         onClick={sendTestNotification}
         style={{
@@ -657,16 +652,24 @@ export default function Home() {
         🔔 تست اعلان
       </button>
 
-      {/* ===== تبلیغات یکتانت ===== */}
       <div className="yn-bnr" id="ynpos-19950"></div>
-      {/* ===== تبلیغات تموم شد ===== */}
 
       <div style={styles.sidebarOverlay} onClick={() => setSidebarOpen(false)} />
       <div style={styles.sidebar}>
         <button style={styles.sidebarClose} onClick={() => setSidebarOpen(false)}>✕</button>
 
         <div style={styles.sidebarUser}>
-          <div style={styles.sidebarAvatar}>{user?.name?.[0] || '👤'}</div>
+          <div style={styles.sidebarAvatar}>
+            {avatarImage ? (
+              <img
+                src={avatarImage}
+                alt="avatar"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+              />
+            ) : (
+              user?.name?.[0] || '👤'
+            )}
+          </div>
           <div>
             <div style={styles.sidebarName}>{user?.name || 'کاربر'}</div>
             <div style={styles.sidebarEmail}>{user?.email || 'user@email.com'}</div>
@@ -687,7 +690,7 @@ export default function Home() {
           <div style={styles.themeDots}>
             {allThemes.map(t => {
               const isPremium = isThemePremium(t);
-              const canUse = true; // همه تم‌ها برای همه فعال
+              const canUse = true;
               return (
                 <div
                   key={t}
