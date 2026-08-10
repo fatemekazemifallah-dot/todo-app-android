@@ -631,26 +631,6 @@ export default function Home() {
         </div>
       </div>
 
-      <button
-        onClick={sendTestNotification}
-        style={{
-          width: '100%',
-          padding: '12px',
-          marginTop: '12px',
-          borderRadius: '14px',
-          border: 'none',
-          background: currentTheme.primary,
-          color: '#fff',
-          fontSize: '14px',
-          fontWeight: '600',
-          cursor: 'pointer',
-          boxShadow: `0 4px 16px ${currentTheme.primary}40`,
-        }}
-        onMouseEnter={(e) => e.target.style.transform = 'scale(1.02)'}
-        onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
-      >
-        🔔 تست اعلان
-      </button>
 
       <div className="yn-bnr" id="ynpos-19950"></div>
 
