@@ -20,6 +20,9 @@ export default function Home() {
   const [filter, setFilter] = useState('all');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showEduAssistant, setShowEduAssistant] = useState(false);
+  
+  // ===== عکس پروفایل =====
+  const [avatarImage, setAvatarImage] = useState(null);
 
   // ===== درخواست مجوز اعلان =====
   useEffect(() => {
@@ -31,6 +34,14 @@ export default function Home() {
           console.warn('❌ کاربر اجازه ارسال اعلان را نداد.');
         }
       });
+    }
+  }, []);
+
+  // ===== بارگذاری عکس پروفایل =====
+  useEffect(() => {
+    const savedImage = localStorage.getItem('user_avatar');
+    if (savedImage) {
+      setAvatarImage(savedImage);
     }
   }, []);
 
@@ -79,7 +90,6 @@ export default function Home() {
       setNewTask('');
       
       // ===== ارسال اعلان یادآوری =====
-      // (برای تست، بعد از ۳ ثانیه یک اعلان آزمایشی می‌فرستیم)
       setTimeout(() => {
         sendNotification('⏰ یادآوری تسک', `زمان انجام "${newTaskObj.text}" رسیده!`);
       }, 3000);
@@ -502,7 +512,15 @@ export default function Home() {
       <div style={styles.header}>
         <div style={styles.headerLeft}>
           <div style={styles.avatar}>
-            <AvatarIcon seed={user?.email} size={44} />
+            {avatarImage ? (
+              <img
+                src={avatarImage}
+                alt="avatar"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            ) : (
+              <AvatarIcon seed={user?.email} size={44} />
+            )}
           </div>
           <div style={styles.userInfo}>
             <span style={styles.userName}>{user?.name || 'کاربر'}</span>
