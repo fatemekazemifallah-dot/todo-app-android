@@ -632,8 +632,6 @@ export default function Home() {
       </div>
 
 
-      <div className="yn-bnr" id="ynpos-19950"></div>
-
       <div style={styles.sidebarOverlay} onClick={() => setSidebarOpen(false)} />
       <div style={styles.sidebar}>
         <button style={styles.sidebarClose} onClick={() => setSidebarOpen(false)}>✕</button>
